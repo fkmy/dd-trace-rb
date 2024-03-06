@@ -360,6 +360,7 @@ RSpec.describe Datadog::Profiling::Collectors::ThreadContext do
 
         context 'when thread has a tracer context, and a trace is in progress' do
           let(:root_span_type) { 'not-web' }
+          let(:allow_invalid_ids) { false }
 
           let(:t1) do
             Thread.new(ready_queue) do |ready_queue|
@@ -377,8 +378,10 @@ RSpec.describe Datadog::Profiling::Collectors::ThreadContext do
           end
 
           before do
-            expect(@t1_span_id).to be > 0
-            expect(@t1_local_root_span_id).to be > 0
+            unless allow_invalid_ids
+              expect(@t1_span_id).to be > 0
+              expect(@t1_local_root_span_id).to be > 0
+            end
           end
 
           it 'includes "local root span id" and "span id" labels in the samples' do
@@ -820,6 +823,34 @@ RSpec.describe Datadog::Profiling::Collectors::ThreadContext do
 
                   expect(t1_sample.labels).to_not include(:'trace endpoint' => anything)
                 end
+              end
+            end
+
+            context 'when current span is invalid' do
+              let(:allow_invalid_ids) { true }
+
+              let(:t1) do
+                Thread.new(ready_queue, otel_tracer) do |ready_queue, _otel_tracer|
+                  OpenTelemetry::Trace.with_span(OpenTelemetry::Trace::Span::INVALID) do |span|
+                    @t1_span_id = otel_span_id_to_i(span.context.span_id)
+                    @t1_local_root_span_id = @t1_span_id
+                    ready_queue << true
+                    sleep
+                  end
+                end
+              end
+
+              before do
+                expect(@t1_span_id).to be 0
+              end
+
+              it 'does not include the "local root span id" and "span id" labels in the samples' do
+                sample
+
+                expect(t1_sample.labels).to_not include(
+                  :'local root span id' => anything,
+                  :'span id' => anything,
+                )
               end
             end
           end
