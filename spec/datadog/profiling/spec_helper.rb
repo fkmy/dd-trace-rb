@@ -65,7 +65,7 @@ module ProfileHelpers
 
               # Tell Ruby to reinterpret the number back into uint64 little-endian bytes, and then read them again;
               # Protocol buffers always represents stuff as little-endian https://protobuf.dev/programming-guides/encoding/
-              [it.num].pack('Q<').unpack1('Q<')
+              [it.num].pack('Q<').unpack('Q<').first
             else
               it.num
             end
