@@ -255,6 +255,7 @@ RSpec.describe 'AWS instrumentation' do
     end
 
     describe '#send_message_batch' do
+      # TODO: SHOULD TAG ALL MESSAGES
       subject!(:send_message_batch) do
         client.send_message_batch(
           {
@@ -471,6 +472,11 @@ RSpec.describe 'AWS instrumentation' do
         expect(span.get_tag(Datadog::Tracing::Metadata::Ext::TAG_PEER_HOSTNAME))
           .to eq('sns.us-stubbed-1.amazonaws.com')
       end
+    end
+
+    describe '#publish_batch' do
+      # TODO: Implement this test
+      # Should tag all messages, not just one.
     end
 
     describe '#create_topic' do

@@ -11,8 +11,12 @@ module Datadog
           # SQS tag handlers.
           class SQS < Base
             def before_span(config, context)
-              if config[:propagation] && context.operation == :receive_message
-                extract_propagation(context)
+              # DEV: Because we only support tracing propagation today, having separate `propagation and `propagation_style`
+              # options seems redundant. But when the DSM propagation is introduced, it's possible for `propagation` to be
+              # enable and `propagation_style` to disable, while DSM propagation is still enabled, as its data is not
+              # directly related to tracing parentage.
+              if config[:propagation] && config[:parentage_style] == 'distributed' && context.operation == :receive_message
+                extract_propagation!(context)
               end
             end
 

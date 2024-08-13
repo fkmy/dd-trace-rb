@@ -12,7 +12,7 @@ module Datadog
 
             MESSAGE_ATTRIBUTES_LIMIT = 10 # Can't set more than 10 message attributes
 
-            def extract_propagation(context)
+            def extract_propagation!(context)
               message_attributes = context.params[:message_attributes]
 
               return unless message_attributes && (datadog = message_attributes['_datadog'])
