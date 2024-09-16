@@ -31,16 +31,16 @@ jobs:
                 version: '3.3'
               - name: ruby
                 version: '3.2'
-              # - name: ruby
-              #   version: '3.1'
-              # - name: ruby
-              #   version: '3.0'
-              # - name: ruby
-              #   version: '2.7'
-              # - name: ruby
-              #   version: '2.6'
-              # - name: ruby
-              #   version: '2.5'
+              - name: ruby
+                version: '3.1'
+              - name: ruby
+                version: '3.0'
+              - name: ruby
+                version: '2.7'
+              - name: ruby
+                version: '2.6'
+              - name: ruby
+                version: '2.5'
               # - name: jruby
               #   version: '9.4'
               # - name: jruby
@@ -68,7 +68,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: 'datadog-gem-${{ matrix.engine.name }}-${{ matrix.engine.version }}-gha${{ github.run_id }}'
-          path: gemfiles/${{ matrix.engine.name }}_${{ matrix.engine.version }}*
+          path: gemfiles/${{ matrix.engine.name }}_${{ matrix.engine.version }}_*
+      
+      - name: Test
+        run: git diff
 
   aggregate:
     needs: build
@@ -77,35 +80,35 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # - name: Download artifacts for Ruby 2.5
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: 'datadog-gem-ruby-2.5-gha${{ github.run_id }}'
-      #     path: gemfiles
+      - name: Download artifacts for Ruby 2.5
+        uses: actions/download-artifact@v4
+        with:
+          name: 'datadog-gem-ruby-2.5-gha${{ github.run_id }}'
+          path: gemfiles
 
-      # - name: Download artifacts for Ruby 2.6
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: 'datadog-gem-ruby-2.6-gha${{ github.run_id }}'
-      #     path: gemfiles
+      - name: Download artifacts for Ruby 2.6
+        uses: actions/download-artifact@v4
+        with:
+          name: 'datadog-gem-ruby-2.6-gha${{ github.run_id }}'
+          path: gemfiles
 
-      # - name: Download artifacts for Ruby 2.7
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: 'datadog-gem-ruby-2.7-gha${{ github.run_id }}'
-      #     path: gemfiles
+      - name: Download artifacts for Ruby 2.7
+        uses: actions/download-artifact@v4
+        with:
+          name: 'datadog-gem-ruby-2.7-gha${{ github.run_id }}'
+          path: gemfiles
 
-      # - name: Download artifacts for Ruby 3.0
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: 'datadog-gem-ruby-3.0-gha${{ github.run_id }}'
-      #     path: gemfiles
+      - name: Download artifacts for Ruby 3.0
+        uses: actions/download-artifact@v4
+        with:
+          name: 'datadog-gem-ruby-3.0-gha${{ github.run_id }}'
+          path: gemfiles
 
-      # - name: Download artifacts for Ruby 3.1
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: 'datadog-gem-ruby-3.1-gha${{ github.run_id }}'
-      #     path: gemfiles
+      - name: Download artifacts for Ruby 3.1
+        uses: actions/download-artifact@v4
+        with:
+          name: 'datadog-gem-ruby-3.1-gha${{ github.run_id }}'
+          path: gemfiles
 
       - name: Download artifacts for Ruby 3.2
         uses: actions/download-artifact@v4
