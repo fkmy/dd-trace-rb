@@ -69,9 +69,7 @@ jobs:
         with:
           name: 'datadog-gem-${{ matrix.engine.name }}-${{ matrix.engine.version }}-gha${{ github.run_id }}'
           path: gemfiles/${{ matrix.engine.name }}_${{ matrix.engine.version }}_*
-      
-      - name: Test
-        run: git diff
+
 
   aggregate:
     needs: build
