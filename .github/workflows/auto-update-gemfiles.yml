@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - quinna/update-gemfiles
+      # TODO: replace this with a cronjob
   workflow_dispatch:
 
 # Ensure obsolete job is cancelled if another commit is pushed to the same branch.
@@ -144,5 +145,9 @@ jobs:
           name: 'datadog-gem-jruby-9.4-gha${{ github.run_id }}'
           path: gemfiles
       
-      - name: Output Git diff
-        run: git diff
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: test-update-gemfiles
+          delete-branch: true
+          title: 'Test Update Gemfiles'
