@@ -41,12 +41,12 @@ jobs:
                 version: '2.6'
               - name: ruby
                 version: '2.5'
-              # - name: jruby
-              #   version: '9.4'
-              # - name: jruby
-              #   version: '9.3'
-              # - name: jruby
-              #   version: '9.2'
+              - name: jruby
+                version: '9.4'
+              - name: jruby
+                version: '9.3'
+              - name: jruby
+                version: '9.2'
     container:
       image: "ghcr.io/datadog/images-rb/engines/${{ matrix.engine.name }}:${{ matrix.engine.version }}"
     steps:
@@ -126,11 +126,23 @@ jobs:
           name: 'datadog-gem-ruby-3.4-gha${{ github.run_id }}'
           path: gemfiles
 
-      - run: git diff
+      - name: Download artifacts for JRuby 9.2
+        uses: actions/download-artifact@v4
+        with:
+          name: 'datadog-gem-jruby-9.2-gha${{ github.run_id }}'
+          path: gemfiles
+      
+      - name: Download artifacts for JRuby 9.3
+        uses: actions/download-artifact@v4
+        with:
+          name: 'datadog-gem-jruby-9.3-gha${{ github.run_id }}'
+          path: gemfiles
 
-      # TODO: add more runtime artifacts here
-
-      # - name: Commit files and show diff
-      #   run: |
-      #     git add aggregated/
-      #     git diff --cached
+      - name: Download artifacts for JRuby 9.4
+        uses: actions/download-artifact@v4
+        with:
+          name: 'datadog-gem-jruby-9.4-gha${{ github.run_id }}'
+          path: gemfiles
+      
+      - name: Output Git diff
+        run: git diff
