@@ -5,7 +5,7 @@ name: Auto-update Gemfiles
 on:
   push:
     branches:
-      - tonycthsu/update-gemfiles
+      - quinna/update-gemfiles
   workflow_dispatch:
 
 # Ensure obsolete job is cancelled if another commit is pushed to the same branch.
