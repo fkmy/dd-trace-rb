@@ -152,5 +152,7 @@ jobs:
         with:
           token: ${{secrets.GITHUB_TOKEN}}
           branch: test-update-gemfiles
+          commit-message: "Test Gemfiles update"
           delete-branch: true
+          base: master
           title: 'Test Update Gemfiles'
