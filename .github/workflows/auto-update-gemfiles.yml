@@ -5,9 +5,9 @@ name: Auto-update Gemfiles
 on:
   push:
     branches:
-      - quinna/update-gemfiles
+      - tonycthsu/update-gemfiles
   workflow_dispatch:
-    
+
 # Ensure obsolete job is cancelled if another commit is pushed to the same branch.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -31,16 +31,16 @@ jobs:
                 version: '3.3'
               - name: ruby
                 version: '3.2'
-              - name: ruby
-                version: '3.1'
-              - name: ruby
-                version: '3.0'
-              - name: ruby
-                version: '2.7'
-              - name: ruby
-                version: '2.6'
-              - name: ruby
-                version: '2.5'
+              # - name: ruby
+              #   version: '3.1'
+              # - name: ruby
+              #   version: '3.0'
+              # - name: ruby
+              #   version: '2.7'
+              # - name: ruby
+              #   version: '2.6'
+              # - name: ruby
+              #   version: '2.5'
               # - name: jruby
               #   version: '9.4'
               # - name: jruby
@@ -49,57 +49,26 @@ jobs:
               #   version: '9.2'
     container:
       image: "ghcr.io/datadog/images-rb/engines/${{ matrix.engine.name }}:${{ matrix.engine.version }}"
-      options: --user 1001
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch all history to access all branches
 
-      - name: Test git command
-        run: git status
-      
-      - name: Show which user id we need
-        run: ls -n /__w/dd-trace-rb/dd-trace-rb
-      
+      - run : ls -al
+
       - name: Output Ruby version
         run: ruby -v
-      
-      # - name: Give permissions for bundle cache
-      #   run: | 
-      #     sudo chown -R 1001:1001 /usr/local/bundle/cache
-      #     sudo chmod -R u+w /usr/local/bundle/cache
 
-      - name: Build gem
-        run: |
-            bundle install
-            bundle exec rake edge:update
+      - name: Bundle
+        run: bundle install
 
-      - name: Capture modified gemfiles
-        run: |
-          git status --porcelain | grep '^ M gemfiles/' | awk '{print $2}' > modified_files.txt
-
-      - name: Store modified gemfiles
-        id: mod_files
-        run: |
-          mkdir -p artifacts/${{ matrix.engine.version }}
-          VERSION=${{ matrix.engine.version }}
-        
-          # Find all modified gemfiles and move them to the artifacts directory
-          while IFS= read -r file; do
-            mkdir -p "artifacts/${VERSION}/$(dirname "$file")"
-            echo "Moving $file to artifacts/${VERSION}/$file"
-            mv "$file" "artifacts/${VERSION}/$file"
-          done < modified_files.txt
-
-          # Print files
-          ls -R artifacts/${{ matrix.engine.version }}/
+      - name: Update
+        run: bundle exec rake edge:update
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'datadog-gem-${{ matrix.engine.name }}-${{ matrix.engine.version }}-gha${{ github.run_id }}'
-          path: artifacts/${{ matrix.engine.version }}
+          path: gemfiles/${{ matrix.engine.name }}_${{ matrix.engine.version }}*
 
   aggregate:
     needs: build
@@ -108,61 +77,57 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download artifacts for Ruby 2.5
-        uses: actions/download-artifact@v3
-        with:
-          name: 'datadog-gem-ruby-2.5-gha${{ github.run_id }}'
-          path: artifacts/2.5
+      # - name: Download artifacts for Ruby 2.5
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: 'datadog-gem-ruby-2.5-gha${{ github.run_id }}'
+      #     path: gemfiles
 
-      - name: Download artifacts for Ruby 2.6
-        uses: actions/download-artifact@v3
-        with:
-          name: 'datadog-gem-ruby-2.6-gha${{ github.run_id }}'
-          path: artifacts/2.6
+      # - name: Download artifacts for Ruby 2.6
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: 'datadog-gem-ruby-2.6-gha${{ github.run_id }}'
+      #     path: gemfiles
 
-      - name: Download artifacts for Ruby 2.7
-        uses: actions/download-artifact@v3
-        with:
-          name: 'datadog-gem-ruby-2.7-gha${{ github.run_id }}'
-          path: artifacts/2.7
+      # - name: Download artifacts for Ruby 2.7
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: 'datadog-gem-ruby-2.7-gha${{ github.run_id }}'
+      #     path: gemfiles
 
-      - name: Download artifacts for Ruby 3.0
-        uses: actions/download-artifact@v3
-        with:
-          name: 'datadog-gem-ruby-3.0-gha${{ github.run_id }}'
-          path: artifacts/3.0
+      # - name: Download artifacts for Ruby 3.0
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: 'datadog-gem-ruby-3.0-gha${{ github.run_id }}'
+      #     path: gemfiles
 
-      - name: Download artifacts for Ruby 3.1
-        uses: actions/download-artifact@v3
-        with:
-          name: 'datadog-gem-ruby-3.1-gha${{ github.run_id }}'
-          path: artifacts/3.1
-    
+      # - name: Download artifacts for Ruby 3.1
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: 'datadog-gem-ruby-3.1-gha${{ github.run_id }}'
+      #     path: gemfiles
+
       - name: Download artifacts for Ruby 3.2
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: 'datadog-gem-ruby-3.2-gha${{ github.run_id }}'
-          path: artifacts/3.3
-    
+          path: gemfiles
 
       - name: Download artifacts for Ruby 3.3
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: 'datadog-gem-ruby-3.3-gha${{ github.run_id }}'
-          path: artifacts/3.3
-    
+          path: gemfiles
+
       - name: Download artifacts for Ruby 3.4
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: 'datadog-gem-ruby-3.4-gha${{ github.run_id }}'
-          path: artifacts/3.4
-      
+          path: gemfiles
+
+      - run: git diff
+
       # TODO: add more runtime artifacts here
-    
-      - name: List contents of artifacts directory
-        run: |
-          echo "Contents of artifacts directory:"
-          ls -R artifacts/
 
       # - name: Commit files and show diff
       #   run: |
