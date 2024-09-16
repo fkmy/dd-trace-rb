@@ -145,6 +145,8 @@ jobs:
           name: 'datadog-gem-jruby-9.4-gha${{ github.run_id }}'
           path: gemfiles
       
+      - run: git diff
+      
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
