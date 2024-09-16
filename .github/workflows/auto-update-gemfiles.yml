@@ -146,10 +146,11 @@ jobs:
           path: gemfiles
       
       - run: git diff
-      
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{secrets.GITHUB_TOKEN}}
           branch: test-update-gemfiles
           delete-branch: true
           title: 'Test Update Gemfiles'
